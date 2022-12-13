@@ -1,5 +1,7 @@
 require("dotenv").config();
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomiclabs/hardhat-web3");
+require("hardhat-gas-reporter");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -12,13 +14,14 @@ module.exports = {
       },
     },
   },
-  defaultNetwork: "mainnet",
+  gasReporter: {
+    enabled: true,
+    currency: 'CHF',
+    gasPrice: 21
+  },
+  defaultNetwork: "hardhat",
   networks: {
     hardhat: {},
-    mainnet: {
-      url: `${process.env.ALCHEMY_RPC_URL}`,
-      accounts: [`0x${process.env.PRIVATE_KEY}`],
-    },
   },
   paths: {
     sources: "./contracts",

@@ -2,11 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "./BZAccessControl.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract AdminContract {
+contract AdminContract is Context {
     BZAccessControl private _accessControl;
 
     constructor() {}
+
+    modifier onlyRole(bytes32 role) {
+        _checkRole(role, _msgSender());
+        _;
+    }
 
     function setAccessControl(address _address) external {
         _accessControl = BZAccessControl(_address);
@@ -50,5 +57,22 @@ contract AdminContract {
 
     function getRoleCount(bytes32 role) external view returns (uint256) {
         return _accessControl.getRoleCount(role);
+    }
+
+    function senderProtected(bytes32 role) public onlyRole(role) {}
+
+    function _checkRole(bytes32 role, address account) internal view {
+        if (!_accessControl.hasRole(role, account)) {
+            revert(
+                string(
+                    abi.encodePacked(
+                        "AdminContract: account ",
+                        Strings.toHexString(uint160(account), 20),
+                        " is missing role ",
+                        Strings.toHexString(uint256(role), 32)
+                    )
+                )
+            );
+        }
     }
 }

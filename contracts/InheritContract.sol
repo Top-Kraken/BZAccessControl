@@ -5,6 +5,8 @@ import "./BZAccessControl.sol";
 
 contract InheritContract is BZAccessControl {
     constructor() {
-        _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _grantAdminRole(msg.sender);
     }
+
+    function senderProtected(bytes32 role) public onlyRole(role) {}
 }

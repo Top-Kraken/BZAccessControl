@@ -7,8 +7,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./interfaces/IBZAccessControl.sol";
 import "./interfaces/IBunzz.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz {
+contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz, ERC165 {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     struct RoleData {
@@ -35,6 +36,10 @@ contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz {
     modifier onlyRole(bytes32 role) {
         _checkRole(role, _msgSender());
         _;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IBZAccessControl).interfaceId || super.supportsInterface(interfaceId);
     }
 
     function hasRole(bytes32 role, address account) public view returns (bool) {
