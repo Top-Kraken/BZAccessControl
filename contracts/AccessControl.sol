@@ -5,11 +5,11 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "./interfaces/IBZAccessControl.sol";
+import "./interfaces/IAccessControl.sol";
 import "./interfaces/IBunzz.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz, ERC165 {
+contract AccessControl is Context, Ownable, IAccessControl, IBunzz, ERC165 {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     struct RoleData {
@@ -38,8 +38,16 @@ contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz, ERC165 {
         _;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IBZAccessControl).interfaceId || super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override
+        returns (bool)
+    {
+        return
+            interfaceId == type(IAccessControl).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
     function hasRole(bytes32 role, address account) public view returns (bool) {
@@ -92,7 +100,7 @@ contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz, ERC165 {
             revert(
                 string(
                     abi.encodePacked(
-                        "BZAccessControl: account ",
+                        "AccessControl: account ",
                         Strings.toHexString(uint160(account), 20),
                         " is missing role ",
                         Strings.toHexString(uint256(role), 32)
@@ -120,7 +128,7 @@ contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz, ERC165 {
     function _grantRole(bytes32 role, address account) internal {
         require(
             role != DEFAULT_ADMIN_ROLE,
-            "BZAccessControl: can only grant default admin role"
+            "AccessControl: can only grant default admin role"
         );
         if (!hasRole(role, account)) {
             _roles[role].accounts.add(account);
@@ -132,7 +140,7 @@ contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz, ERC165 {
     function _revokeRole(bytes32 role, address account) internal {
         require(
             role != DEFAULT_ADMIN_ROLE,
-            "BZAccessControl: can only revoke default admin role"
+            "AccessControl: can only revoke default admin role"
         );
         if (hasRole(role, account)) {
             _roles[role].accounts.remove(account);
@@ -144,7 +152,7 @@ contract BZAccessControl is Context, Ownable, IBZAccessControl, IBunzz, ERC165 {
     function _renounceRole(bytes32 role, address account) internal {
         require(
             account == _msgSender(),
-            "BZAccessControl: can only renounce role for self"
+            "AccessControl: can only renounce role for self"
         );
 
         if (hasRole(role, account)) {
